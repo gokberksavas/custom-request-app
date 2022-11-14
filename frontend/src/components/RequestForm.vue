@@ -1,6 +1,8 @@
 <script lang="ts">
 import { QInputProps } from 'quasar';
 import { defineComponent, Ref, ref, watch } from 'vue';
+import { createRequest } from '../utils/Api'
+import { useRouter } from 'vue-router'
 
 interface FormState {
   full_name: string;
@@ -63,7 +65,8 @@ export default defineComponent({
     const isButtonDisabled = ref(true);
     const loadingButton = ref(false);
     const formSubmitted = ref(false);
-    const animateIcon = ref(false);
+    const animateIcon = ref(formSubmitted);
+    const router = useRouter();
 
     const validateName = (): boolean => {
       return form.value.full_name !== '' && form.value.full_name.length >= 5;
@@ -101,27 +104,18 @@ export default defineComponent({
     };
 
     const handleSubmit = async () => {
-      var formData = form.value;
-
       loadingButton.value = true;
 
-      await fetch('http://localhost:3000/orders/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      })
-        .then((data) => {
-          console.log(data);
+      createRequest(form.value)
+        .then(res => console.log(res))
+        .then(() => {
+          formSubmitted.value = true
 
-          formSubmitted.value = true;
-          animateIcon.value = true;
+          setTimeout(() => {
+            router.push({path: '/'});
+          }, 4000)
         })
-        .catch((err) => console.log(err))
-        .finally(() => {
-          console.log('finally');
-        });
+        .catch(err => console.log(err));
     };
 
     watch(form.value, () => {
@@ -235,18 +229,19 @@ export default defineComponent({
 
 @keyframes success-icon {
   0% {
-    transform: rotateY(0deg);
+    transform: scale(1);
   }
   50% {
-    transform: rotateY(180deg);
+    transform: scale(1.2);
   }
   100% {
-    transform: rotateY(360deg);
+    transform: scale(1);
   }
 }
 
 .icon-animated {
   animation-name: success-icon;
   animation-duration: 2s;
+  animation-iteration-count: 2;
 }
 </style>
