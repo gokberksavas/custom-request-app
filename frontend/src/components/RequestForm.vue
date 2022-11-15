@@ -56,33 +56,23 @@ export default defineComponent({
     ];
 
     const form: Ref<FormState> = ref({
-      full_name: 'gokberk',
-      phone_number: '12312312312',
-      email: 'askdaklsjdas@gmail.com',
-      description: 'aksdajshdjahsdjahsjdh',
+      full_name: '',
+      phone_number: '',
+      email: '',
+      description: '',
     });
 
-    const isButtonDisabled = ref(true);
-    const loadingButton = ref(false);
-    const formSubmitted = ref(false);
-    const animateIcon = ref(formSubmitted);
+    const isButtonDisabled: Ref<boolean> = ref(true);
+    const loadingButton: Ref<boolean> = ref(false);
+    const formSubmitted: Ref<boolean> = ref(false);
+    const animateIcon: Ref<boolean> = ref(formSubmitted);
     const router = useRouter();
 
-    const validateName = (): boolean => {
-      return form.value.full_name !== '' && form.value.full_name.length >= 5;
-    };
+    const validateName = (): boolean => form.value.full_name.length >= 5;
 
-    const validatePhoneNumber = (): boolean => {
-      return (
-        form.value.phone_number !== '' && form.value.phone_number.length === 11
-      );
-    };
+    const validatePhoneNumber = (): boolean => form.value.phone_number.length === 11;
 
-    const validateDescription = (): boolean => {
-      return (
-        form.value.description !== '' && form.value.description.length >= 10
-      );
-    };
+    const validateDescription = (): boolean => form.value.description.length >= 10;
 
     const validateEmail = (): boolean => {
       var inputElement: HTMLInputElement = document.createElement('input');
@@ -158,7 +148,7 @@ export default defineComponent({
         :error-message="config.errorMessage"
         :name="config.name"
         :type="config.type"
-        debounce="250"
+        debounce="150"
         :label="config.label"
         outlined
         :autogrow="config.type === 'textarea'"

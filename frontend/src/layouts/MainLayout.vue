@@ -64,7 +64,7 @@ export default defineComponent({
       <q-tabs
         v-model="initialTab"
         vertical
-        class="text-primary col-grow"
+        class="text-primary col-grow q-py-sm"
         active-bg-color="primary"
         active-color="white"
         indicator-color="transparent"
