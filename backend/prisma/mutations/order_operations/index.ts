@@ -51,10 +51,10 @@ const updateOrderStatus = async (updatedOrder:Order) => {
     return order;
 };
 
-export const db = {
+export const orderDb = {
     createOrder,
     deleteOrder,
     getAllOrders,
     getOrderById,
     updateOrderStatus
-}
+};
