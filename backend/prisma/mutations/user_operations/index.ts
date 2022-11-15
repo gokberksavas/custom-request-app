@@ -14,7 +14,7 @@ const createUser = async (userData:User) => {
   }
 };
 
-const getUser = async (userEmail:User['email']) => {
+const getUserByEmail = async (userEmail:User['email']) => {
   try {
     const user = await prisma.user.findUnique({
       where: {
@@ -30,5 +30,5 @@ const getUser = async (userEmail:User['email']) => {
 
 export const userDb = {
   createUser,
-  getUser
+  getUserByEmail
 };
