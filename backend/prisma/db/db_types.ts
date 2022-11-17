@@ -1,9 +1,9 @@
-export type Credential = {
+export interface Credential {
   email: string;
   password: string;
 }
 
-export type Identifier = {
+export interface Identifier {
   id?: number,
   email?: string
 }

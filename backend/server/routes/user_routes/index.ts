@@ -26,11 +26,11 @@ userRouter.post('/login', async (req, res) => {
   const authenticated = await authenticateUser(body.email, body.password);
 
   if (authenticated) {
-    const user = await userDb.getUser(body.email);
+    const user = await userDb.getUser({ email: body.email });
     
     res.status(200).send(user);
   }
   else {
-    res.status(404).send('Invalid email or password!');
+    res.status(404).send({ message: 'Invalid email or password!'});
   }
 });

@@ -10,5 +10,5 @@ app.use('/', orderRouter);
 app.use('/user', userRouter);
 
 app.listen(3000, () => {
-    console.log('Example listening on port:3000');
+    console.log('Server has started on port 3000');
 });
