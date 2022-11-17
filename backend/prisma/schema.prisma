@@ -16,7 +16,7 @@ model Order {
   email        String
   phone_number String
   description  String     @db.VarChar(255)
-  created_at   DateTime  @default(now())
+  created_at   DateTime   @default(now())
   resolved     Boolean    @default(false)
 }
 
@@ -24,6 +24,7 @@ model User {
   id        Int @id @default(autoincrement())
   email     String @unique
   password  String
+  full_name String
   role      Role @default(USER)
 }
 

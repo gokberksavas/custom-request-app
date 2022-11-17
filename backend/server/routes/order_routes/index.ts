@@ -1,5 +1,5 @@
 import { Order } from "@prisma/client";
-import { orderDb } from "../../../prisma/mutations/order_operations";
+import { orderDb } from "../../../prisma/db/order";
 import express from "express";
 
 export const orderRouter = express.Router();

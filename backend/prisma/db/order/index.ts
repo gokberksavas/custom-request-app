@@ -20,7 +20,7 @@ const deleteOrder = async (orderId:number) => {
     return deletedOrder;
 };
 
-const getAllOrders = async () => {
+const getAllOrders = async () :Promise<Order[]> => {
     const allOrders = await prisma.order.findMany({
         orderBy: {
             created_at: 'desc'
@@ -30,7 +30,7 @@ const getAllOrders = async () => {
     return allOrders;
 };
 
-const getOrderById = async (orderId:number) => {
+const getOrderById = async (orderId:number): Promise<Order | null> => {
     const order = await prisma.order.findUnique({
         where: {
             id: orderId
@@ -40,7 +40,7 @@ const getOrderById = async (orderId:number) => {
     return order;
 };
 
-const updateOrderStatus = async (updatedOrder:Order) => {
+const updateOrderStatus = async (updatedOrder:Order) : Promise<Order> => {
     const order = await prisma.order.update({
         where: {
             id: updatedOrder.id
