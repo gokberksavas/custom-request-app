@@ -1,11 +1,18 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
+import type { Ref } from 'vue';
+import { useUserStore } from 'stores/user';
 
 export default defineComponent({
   name: 'MainLayout',
   setup() {
-    const initialTab = ref('portfolio');
-    const sideBarExpanded = ref(false);
+    const userStore = useUserStore();
+    const activeUser: Ref<{ id?: string, role?: string, email?: string, full_name?: string}> = ref(userStore.activeUser);
+
+    userStore.$subscribe(() => { activeUser.value = userStore.activeUser });
+
+    const initialTab: Ref<string> = ref('home');
+    const sideBarExpanded: Ref<boolean> = ref(false);
 
     interface tabConfig {
       name: string;
@@ -16,27 +23,44 @@ export default defineComponent({
 
     const tabConfig: tabConfig[] = [
       {
-        name: 'about',
+        name: 'home',
         icon: 'home',
-        label: 'Ana Sayfa',
+        label: 'ANA SAYFA',
         to: '/',
       },
       {
         name: 'portfolio',
         icon: 'dashboard',
-        label: 'Portfolyomuz',
-        to: 'portfolio',
+        label: 'PORTFOLYOMUZ',
+        to: '/portfolio',
       },
       {
         name: 'request-form',
         icon: 'mail_outline',
-        label: 'İstek Formu',
-        to: 'request-form',
-      },
+        label: 'İSTEK FORMU',
+        to: '/request-form',
+      }
     ];
+
+    const adminTabConfig = [
+      {
+        name: 'request-dashboard',
+        icon: 'format_list_bulleted',
+        label: 'İSTEK LİSTESİ',
+        to: '/admin/dashboard'
+      },
+      {
+        name: 'logout',
+        icon: 'logout',
+        label: 'ÇIKIŞ YAP',
+        to: '/admin/logout'
+      }
+    ]
 
     return {
       tabConfig,
+      adminTabConfig,
+      activeUser,
       initialTab,
       sideBarExpanded,
     };
@@ -78,7 +102,21 @@ export default defineComponent({
           :to="config.to"
           class="q-my-sm sidebar-tab no-wrap"
           content-class="tab-content-row"
+          :no-caps="true"
         />
+        <template v-if="activeUser.role === 'ADMIN'">
+          <q-route-tab
+            v-for="(config, index) in adminTabConfig"
+            :key="index"
+            :name="config.name"
+            :icon="config.icon"
+            :label="config.label"
+            :to="config.to"
+            class="q-my-sm sidebar-tab no-wrap"
+            content-class="tab-content-row"
+            :no-caps="true"
+          />
+        </template>
       </q-tabs>
       <q-btn
         class="expand-sidebar-btn"
@@ -88,10 +126,8 @@ export default defineComponent({
         @click="sideBarExpanded = !sideBarExpanded"
       />
     </div>
-    <div class="flex row justify-center page-content col-grow no-wrap">
-      <div class="content-wrapper col-grow">
-        <router-view></router-view>
-      </div>
+    <div class="flex row col-grow justify-center page-content">
+      <router-view></router-view>
     </div>
   </div>
 </template>
@@ -113,7 +149,7 @@ $sideBarExpandedWith: 250px;
   background-color: $white;
   transition: width 0.3s;
   position: relative;
-  z-index: 9999999999999;
+  z-index: 1;
   padding: 0 0.1rem;
 
   .sidebar-header {

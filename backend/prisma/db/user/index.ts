@@ -25,7 +25,7 @@ const getUserCredentials = async (userEmail: string) :Promise<Credential | null>
   return userCredentials;
 };
 
-const getUser = async (identifiers: Identifier) :Promise<Partial<User> | boolean>=> {
+const getUser = async (identifiers: Identifier) :Promise<any>=> {
   const user = await prisma.user.findUnique({
     where: identifiers,
     select: {

@@ -15,7 +15,7 @@ model Order {
   full_name    String
   email        String
   phone_number String
-  description  String     @db.VarChar(255)
+  description  String     @db.Text
   created_at   DateTime   @default(now())
   resolved     Boolean    @default(false)
 }

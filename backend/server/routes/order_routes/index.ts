@@ -1,10 +1,11 @@
 import { Order } from "@prisma/client";
 import { orderDb } from "../../../prisma/db/order";
 import express from "express";
+import authorization from "../../middleware/authorization";
 
 export const orderRouter = express.Router();
 
-orderRouter.get('/orders', async (req, res) => {
+orderRouter.get('/orders', authorization, async (req, res) => {
     const allOrders = await orderDb.getAllOrders();
 
     res.statusCode = 200;
