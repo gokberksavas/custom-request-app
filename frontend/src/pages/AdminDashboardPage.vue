@@ -1,12 +1,12 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import AdminDashboard from 'src/components/AdminDashboard.vue';
+import RequestTable from 'src/components/RequestTable.vue';
 import { useUserStore } from 'src/stores/user';
 
 export default defineComponent({
   name: 'AdminDashboardPage',
   components: {
-    AdminDashboard,
+    RequestTable,
   },
   setup() {
     const userStore = useUserStore();
@@ -54,6 +54,6 @@ export default defineComponent({
         />
       </div>
     </div>
-    <AdminDashboard />
+    <RequestTable />
   </div>
 </template>

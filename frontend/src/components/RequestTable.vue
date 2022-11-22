@@ -4,7 +4,7 @@ import type { Ref } from 'vue';
 import { QTableColumn } from 'quasar';
 
 export default defineComponent({
-  name: 'AdminDashboard',
+  name: 'RequestTable',
   setup() {
     const orders: Ref<QTableColumn[]> = ref([]);
     const getAllOrders = () => {
