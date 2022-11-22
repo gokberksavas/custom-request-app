@@ -33,7 +33,7 @@ export default defineComponent({
       },
       {
         name: 'portfolio',
-        icon: 'dashboard',
+        icon: 'format_list_bulleted',
         label: 'PORTFOLYOMUZ',
         to: '/portfolio',
       },
@@ -47,9 +47,9 @@ export default defineComponent({
 
     const adminTabConfig = [
       {
-        name: 'request-dashboard',
-        icon: 'format_list_bulleted',
-        label: 'İSTEK LİSTESİ',
+        name: 'dashboard',
+        icon: 'dashboard',
+        label: 'ADMIN PANELİ',
         to: '/admin/dashboard'
       },
       {
@@ -82,7 +82,7 @@ export default defineComponent({
     >
       <div class="flex no-wrap row items-center sidebar-header q-pa-sm">
         <q-avatar class="avatar">
-          <img src="https://cdn.quasar.dev/img/avatar.png" />
+          <img src="../assets/mockup-logo.jpg" />
         </q-avatar>
         <div
           v-if="sideBarExpanded"
@@ -133,7 +133,7 @@ export default defineComponent({
         @click="sideBarExpanded = !sideBarExpanded"
       />
     </div>
-    <div class="flex row col-grow justify-center page-content">
+    <div class="flex row full-width justify-center page-content">
       <router-view></router-view>
     </div>
   </div>
@@ -152,9 +152,10 @@ $sideBarExpandedWith: 250px;
 .sidebar {
   height: 100%;
   width: $sideBarWidth;
+  min-width: $sideBarWidth;
   box-shadow: 1px 0 10px $shadow-color;
   background-color: $white;
-  transition: width 0.3s;
+  transition: 0.3s;
   position: relative;
   z-index: 1;
   padding: 0 0.1rem;
@@ -175,6 +176,7 @@ $sideBarExpandedWith: 250px;
 
   &.expanded {
     width: $sideBarExpandedWith;
+    min-width: $sideBarExpandedWith;
 
     .tab-content-row {
       justify-content: flex-start !important;
