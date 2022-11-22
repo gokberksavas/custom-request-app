@@ -1,4 +1,5 @@
 import { route } from 'quasar/wrappers';
+import { useUserStore } from 'src/stores/user';
 import {
   createMemoryHistory,
   createRouter,
@@ -29,6 +30,25 @@ export default route(function (/* { store, ssrContext } */) {
     // quasar.conf.js -> build -> vueRouterMode
     // quasar.conf.js -> build -> publicPath
     history: createHistory(process.env.VUE_ROUTER_BASE),
+  });
+
+  const userStore = useUserStore();
+
+  Router.beforeEach(async (to, from) => {
+    const isLoggedIn = userStore.checkLoginStatus();
+    const userRole = userStore.role;
+
+    if (to.meta.requiresAdmin && userRole !== 'ADMIN') {
+      return {
+        path: '/login',
+      }
+    }
+    
+    if (to.path === '/login' && isLoggedIn) {
+      return {
+        path: '/'
+      }
+    }
   });
 
   return Router;

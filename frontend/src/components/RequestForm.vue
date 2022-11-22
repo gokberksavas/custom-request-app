@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, reactive, ref, watch } from 'vue';
 import type { Ref } from 'vue';
-import * as validation from '../utils/validate-inputs';
+import * as validation from '../utilities/validate-inputs';
 import { useRouter } from 'vue-router';
 
 export default defineComponent({

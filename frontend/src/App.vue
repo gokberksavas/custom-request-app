@@ -1,16 +1,8 @@
 <script lang="ts">
-import { defineComponent, onMounted } from 'vue';
-import { useUserStore } from 'stores/user';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'App',
-  setup () {
-    const userStore = useUserStore();
-
-    onMounted(() => {
-      userStore.checkLoginStatus();
-    });
-  }
 });
 </script>
 

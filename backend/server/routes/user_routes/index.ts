@@ -28,7 +28,7 @@ userRouter.post('/login', async (req, res) => {
 
   if (authenticated) {
     const user = await userDb.getUser({ email: email });
-    const signedJwt = jwt.sign({ user }, process.env.JWT_KEY!, { expiresIn: '120s'});
+    const signedJwt = jwt.sign({ user }, process.env.JWT_KEY!, { expiresIn: '20m'});
 
     res.status(200).send(Object.assign({ user: user, token: signedJwt}));
   }

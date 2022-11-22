@@ -2,16 +2,18 @@
 import { defineComponent, ref } from 'vue';
 import type { Ref } from 'vue';
 import { useUserStore } from 'stores/user';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'MainLayout',
   setup() {
+    const router = useRouter();
     const userStore = useUserStore();
     const activeUser: Ref<{ id?: string, role?: string, email?: string, full_name?: string}> = ref(userStore.activeUser);
 
     userStore.$subscribe(() => { activeUser.value = userStore.activeUser });
 
-    const initialTab: Ref<string> = ref('home');
+    const initialTab: Ref<string> = ref('');
     const sideBarExpanded: Ref<boolean> = ref(false);
 
     interface tabConfig {
@@ -19,6 +21,7 @@ export default defineComponent({
       icon: string;
       label: string;
       to: string;
+      extra_class?: string;
     }
 
     const tabConfig: tabConfig[] = [
@@ -53,7 +56,8 @@ export default defineComponent({
         name: 'logout',
         icon: 'logout',
         label: 'ÇIKIŞ YAP',
-        to: '/admin/logout'
+        to: '/admin/logout',
+        extra_class: 'text-negative'
       }
     ]
 
@@ -63,14 +67,16 @@ export default defineComponent({
       activeUser,
       initialTab,
       sideBarExpanded,
+      router
     };
   },
 });
 </script>
 
 <template>
-  <div class="flex row layout-wrapper">
+  <div class="flex row no-wrap layout-wrapper">
     <div
+      v-if="router.currentRoute.value.path !== '/login'"
       class="flex column justify-center sidebar"
       :class="sideBarExpanded && 'expanded'"
     >
@@ -110,6 +116,7 @@ export default defineComponent({
             :key="index"
             :name="config.name"
             :icon="config.icon"
+            :class="config.extra_class"
             :label="config.label"
             :to="config.to"
             class="q-my-sm sidebar-tab no-wrap"

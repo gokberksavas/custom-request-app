@@ -11,6 +11,5 @@ export default defineComponent({
 </script>
 
 <template>
-  <div>This is dashboardpage</div>
   <AdminDashboard  />
 </template>

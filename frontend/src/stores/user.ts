@@ -1,9 +1,20 @@
 import { defineStore } from 'pinia';
+import * as jose from 'jose';
+
+export interface ActiveUser {
+  id?: string;
+  email?: string;
+  full_name?: string;
+  role?: 'ADMIN' | 'USER'
+}
 
 export const useUserStore = defineStore('user', {
   state: () => ({
-    activeUser: {},
+    activeUser: <ActiveUser> {},
   }),
+  getters: {
+    role: (state) => state.activeUser.role
+  },
   actions: {
     async userLogin(credentials: { email: string, password: string }) {
       try {
@@ -25,16 +36,18 @@ export const useUserStore = defineStore('user', {
         console.error(err);
       }
     },
-    checkLoginStatus () {
+    checkLoginStatus() {
       const userProfile = JSON.parse(window.localStorage.getItem('user-profile') || '{}');
-      const authToken = window.localStorage.getItem('auth-token');
+      const authToken = window.localStorage.getItem('auth-token') || '';
+      const decodedToken = authToken && jose.decodeJwt(authToken);
+      const expired = decodedToken && (new Date().getTime() / 1000) >= (decodedToken.exp || 0) ? true : false;
 
-      if (!userProfile || !authToken) {
+      if (!userProfile || !authToken || expired) {
         window.localStorage.removeItem('user-profile');
         window.localStorage.removeItem('auth-token');
   
         this.$reset();
-  
+
         return false;
       }
 
@@ -42,7 +55,7 @@ export const useUserStore = defineStore('user', {
 
       return true;
     },
-    logOut () {
+    logOut() {
       window.localStorage.removeItem('user-profile');
       window.localStorage.removeItem('auth-token');
 
