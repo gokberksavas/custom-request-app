@@ -1,17 +1,21 @@
-import { User, PrismaClient } from '@prisma/client'
-import type { Credential, Identifier } from '../db_types';
+import { User } from '@prisma/client';
+import prisma from '../initialize-prisma';
 
-const prisma = new PrismaClient();
-
-const createUser = async (userData:User) => {
+const createUser = async (userData:User) :Promise<Partial<User>> => {
   const user = await prisma.user.create({
     data: userData,
+    select: {
+      id: true,
+      email: true,
+      full_name: true,
+      role: true,
+    }
   });
 
   return user;
 };
 
-const getUserCredentials = async (userEmail: string) :Promise<Credential | null>  => {
+const getUserCredentials = async (userEmail: string) :Promise<{ email: string, password: string } | null>  => {
   const userCredentials = await prisma.user.findUnique({
     where: {
       email: userEmail
@@ -25,7 +29,7 @@ const getUserCredentials = async (userEmail: string) :Promise<Credential | null>
   return userCredentials;
 };
 
-const getUser = async (identifiers: Identifier) :Promise<any>=> {
+const getUser = async (identifiers: { email?: string, password?: string }) :Promise<Partial<User> | null>=> {
   const user = await prisma.user.findUnique({
     where: identifiers,
     select: {
@@ -36,7 +40,7 @@ const getUser = async (identifiers: Identifier) :Promise<any>=> {
     }
   });
 
-  return user ? user : false;
+  return user;
 }
 
 export const userDb = {

@@ -7,8 +7,10 @@ export default defineComponent({
   name: 'RequestTable',
   setup() {
     const orders: Ref<QTableColumn[]> = ref([]);
+    const tableLoading: Ref<boolean> = ref(true);
+
     const getAllOrders = () => {
-      fetch('http://localhost:3000/orders', {
+      fetch(`${process.env.API}/orders`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${window.localStorage.getItem('auth-token')}`,
@@ -16,7 +18,8 @@ export default defineComponent({
         },
       })
         .then((res) => res.json())
-        .then((data) => (orders.value = data));
+        .then((data) => (orders.value = data))
+        .then(() => tableLoading.value = false);
     };
 
     const tableColConfig: QTableColumn[] = [
@@ -48,13 +51,14 @@ export default defineComponent({
         name: 'description',
         label: 'Açıklama',
         field: (row) => row.description,
+        format: (val: string) => { return val.length > 30 ? `${val.slice(0, 30)}...` : val },
         align: 'left',
       },
       {
         name: 'created_at',
         label: 'Oluşturulma Tarihi',
         field: (row) => row.created_at,
-        format: (val: string) => new Date(val).toLocaleDateString('tr'),
+        format: (val: string) => `${new Date(val).toLocaleDateString('tr')} ${new Date(val).toLocaleTimeString('tr')}`,
         align: 'left',
       },
       {
@@ -72,13 +76,14 @@ export default defineComponent({
     return {
       orders,
       tableColConfig,
+      tableLoading
     };
   },
 });
 </script>
 
 <template>
-  <div class="full-width">
+  <div class="full-width relative-position">
     <q-table
       title="İstek Listesi"
       bordered
@@ -88,5 +93,8 @@ export default defineComponent({
       virtual-scroll
       row-key="name"
     />
+    <q-inner-loading :showing="tableLoading">
+      <q-spinner-dots size="2rem" color="primary"/>  
+    </q-inner-loading>
   </div>
 </template>

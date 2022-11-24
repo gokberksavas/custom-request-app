@@ -18,16 +18,17 @@ export default defineComponent({
     const onSubmit = () => {
       formStatus.value = 'submitted';
 
-      fetch('http://localhost:3000/orders/create', {
+      fetch(`${process.env.API}/orders/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
-      })
-        .then(() => setTimeout(() => formStatus.value = 'success', 3000))
+      }) 
+        .then((res) => formStatus.value = res.ok ? 'success' : 'fail')
         .catch((err) => {
           console.error(err);
+
           formStatus.value = 'fail';
         });
     };
@@ -66,7 +67,14 @@ export default defineComponent({
       } else if (newStatus === 'fail') {
         showDialog.value = true;
 
-        setTimeout(() => { router.go(0) }, 3000);
+        setTimeout(() => {
+          Object.keys(formData).forEach((key) => {
+            formData[key as keyof typeof formData] = '';
+          });
+
+          formStatus.value = '';
+          showDialog.value = false;
+        }, 3000);
       }
     });
 

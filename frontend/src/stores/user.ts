@@ -5,7 +5,7 @@ export interface ActiveUser {
   id?: string;
   email?: string;
   full_name?: string;
-  role?: 'ADMIN' | 'USER'
+  role?: 'SUPERADMIN'| 'ADMIN' | 'USER'
 }
 
 export const useUserStore = defineStore('user', {
@@ -17,24 +17,26 @@ export const useUserStore = defineStore('user', {
   },
   actions: {
     async userLogin(credentials: { email: string, password: string }) {
-      try {
-        const { email, password } = credentials;
-        const response = await fetch('http://localhost:3000/user/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ email: email, password: password })
-        });
-        const data = await response.json();
+      const { email, password } = credentials;
+      const response = await fetch(`${process.env.API}/user/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email: email, password: password })
+      });
+      const data = await response.json();
 
-        this.activeUser = data.user;
+      this.activeUser = data.user;
 
+      if (data.user) {
         window.localStorage.setItem('auth-token', data.token);
         window.localStorage.setItem('user-profile', JSON.stringify(data.user));
-      } catch (err) {
-        console.error(err);
+
+        return true;
       }
+
+      return false;
     },
     checkLoginStatus() {
       const userProfile = JSON.parse(window.localStorage.getItem('user-profile') || '{}');

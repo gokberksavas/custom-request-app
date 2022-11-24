@@ -8,6 +8,7 @@ import {
 } from 'vue-router';
 
 import routes from './routes';
+import { ROLES } from 'src/enums';
 /*
  * If not building with SSR mode, you can
  * directly export the Router instantiation;
@@ -34,11 +35,11 @@ export default route(function (/* { store, ssrContext } */) {
 
   const userStore = useUserStore();
 
-  Router.beforeEach(async (to, from) => {
+  Router.beforeEach(async (to,) => {
     const isLoggedIn = userStore.checkLoginStatus();
     const userRole = userStore.role;
 
-    if (to.meta.requiresAdmin && userRole !== 'ADMIN') {
+    if (to.meta.requiresAdmin && userRole !== ROLES.ADMIN && userRole !== ROLES.SUPERADMIN) {
       return {
         path: '/login',
       }

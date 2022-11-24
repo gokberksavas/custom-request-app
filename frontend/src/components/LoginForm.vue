@@ -11,17 +11,27 @@ export default defineComponent({
     const email: Ref<string> = ref('');
     const password: Ref<string> = ref('');
     const buttonDisabled: Ref<boolean> = ref(true);
+    const errorPopupActive: Ref<boolean> = ref(false);
     const loadingState = ref(false);
     const router = useRouter();
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
       loadingState.value = true;
 
-      userLogin({ email: email.value, password: password.value })
-        .then(() => {
-          router.push({ path: '/'});
-        })
-        .catch(err => console.error(err));
+      const loginSuccess = await userLogin({ email: email.value, password: password.value });
+
+      loginSuccess ? router.push({ path: '/' }) : handleError();
+    };
+
+    const handleError = () => {
+      errorPopupActive.value = true;
+
+      setTimeout(() => {
+        errorPopupActive.value = false;
+        loadingState.value = false;
+        email.value = '';
+        password.value = '';
+      }, 3000);
     }
 
     watch([email, password], ([newEmail, newPassword]) => {
@@ -33,7 +43,8 @@ export default defineComponent({
       password,
       buttonDisabled,
       handleLogin,
-      loadingState
+      loadingState,
+      errorPopupActive
     };
   },
 });
@@ -70,6 +81,20 @@ export default defineComponent({
         @click="handleLogin"
       />
     </q-form>
+    <q-dialog v-model="errorPopupActive">
+      <q-card>
+        <q-card-section class="text-center">
+          <q-icon 
+            name="cancel"
+            color="negative"
+            size="3rem"
+          />
+        </q-card-section>
+        <q-card-section>
+          <div class="text-body1">Giriş sırasında bir hata oluştu, lütfen tekrar deneyin!</div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
     <q-linear-progress v-if="loadingState" class="q-mt-md" size=".25rem" color="primary" indeterminate/>
   </div>
 </template>

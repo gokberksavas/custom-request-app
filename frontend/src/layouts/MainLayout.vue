@@ -110,7 +110,7 @@ export default defineComponent({
           content-class="tab-content-row"
           :no-caps="true"
         />
-        <template v-if="activeUser.role === 'ADMIN'">
+        <template v-if="activeUser.role === 'SUPERADMIN' || activeUser.role === 'ADMIN'">
           <q-route-tab
             v-for="(config, index) in adminTabConfig"
             :key="index"
