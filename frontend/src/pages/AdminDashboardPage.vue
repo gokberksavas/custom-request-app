@@ -4,7 +4,7 @@ import type { Ref } from 'vue';
 import RequestTable from 'src/components/RequestTable.vue';
 import CreateUserPopup from 'src/components/CreateUserPopup.vue';
 import { useUserStore } from 'src/stores/user';
-import { ROLES} from '../enums';
+import { ROLES } from '../enums';
 
 export default defineComponent({
   name: 'AdminDashboardPage',
@@ -14,7 +14,7 @@ export default defineComponent({
   },
   setup() {
     const userStore = useUserStore();
-    const activeUser = ref(userStore.activeUser);
+    const activeUser = ref(userStore.activeUser); 
     const showCreatePopup: Ref<boolean> = ref(false);
 
     return {

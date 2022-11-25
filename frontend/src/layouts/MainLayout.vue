@@ -3,15 +3,23 @@ import { defineComponent, ref } from 'vue';
 import type { Ref } from 'vue';
 import { useUserStore } from 'stores/user';
 import { useRouter } from 'vue-router';
+import { ROLES } from 'src/enums';
 
 export default defineComponent({
   name: 'MainLayout',
   setup() {
     const router = useRouter();
     const userStore = useUserStore();
-    const activeUser: Ref<{ id?: string, role?: string, email?: string, full_name?: string}> = ref(userStore.activeUser);
+    const activeUser: Ref<{
+      id?: string;
+      role?: string;
+      email?: string;
+      full_name?: string;
+    }> = ref(userStore.activeUser);
 
-    userStore.$subscribe(() => { activeUser.value = userStore.activeUser });
+    userStore.$subscribe(() => {
+      activeUser.value = userStore.activeUser;
+    });
 
     const initialTab: Ref<string> = ref('');
     const sideBarExpanded: Ref<boolean> = ref(false);
@@ -42,7 +50,7 @@ export default defineComponent({
         icon: 'mail_outline',
         label: 'İSTEK FORMU',
         to: '/request-form',
-      }
+      },
     ];
 
     const adminTabConfig = [
@@ -50,16 +58,24 @@ export default defineComponent({
         name: 'dashboard',
         icon: 'dashboard',
         label: 'ADMIN PANELİ',
-        to: '/admin/dashboard'
+        to: '/dashboard',
       },
       {
         name: 'logout',
         icon: 'logout',
         label: 'ÇIKIŞ YAP',
-        to: '/admin/logout',
-        extra_class: 'text-negative'
-      }
-    ]
+        extra_class: 'text-negative',
+      },
+    ];
+
+    const showLogoutPopup: Ref<boolean> = ref(false);
+    const handleLogout = () => {
+      showLogoutPopup.value = false;
+
+      userStore.logout();
+
+      router.push({ path: '/' });
+    };
 
     return {
       tabConfig,
@@ -67,7 +83,10 @@ export default defineComponent({
       activeUser,
       initialTab,
       sideBarExpanded,
-      router
+      router,
+      ROLES,
+      showLogoutPopup,
+      handleLogout,
     };
   },
 });
@@ -110,18 +129,29 @@ export default defineComponent({
           content-class="tab-content-row"
           :no-caps="true"
         />
-        <template v-if="activeUser.role === 'SUPERADMIN' || activeUser.role === 'ADMIN'">
+        <template
+          v-if="
+            activeUser.role === ROLES.ADMIN ||
+            activeUser.role === ROLES.SUPERADMIN
+          "
+        >
           <q-route-tab
-            v-for="(config, index) in adminTabConfig"
-            :key="index"
-            :name="config.name"
-            :icon="config.icon"
-            :class="config.extra_class"
-            :label="config.label"
-            :to="config.to"
+            name="dashboard"
+            icon="dashboard"
+            label="ADMİN PANELİ"
+            to="/dashboard"
             class="q-my-sm sidebar-tab no-wrap"
             content-class="tab-content-row"
             :no-caps="true"
+          />
+          <q-route-tab
+            name="logout"
+            icon="logout"
+            label="ÇIKIŞ YAP"
+            class="q-my-sm sidebar-tab no-wrap text-negative"
+            content-class="tab-content-row"
+            :no-caps="true"
+            @click="showLogoutPopup = true"
           />
         </template>
       </q-tabs>
@@ -137,6 +167,27 @@ export default defineComponent({
       <router-view></router-view>
     </div>
   </div>
+  <q-dialog v-model="showLogoutPopup">
+    <q-card>
+      <q-card-section>
+        <div class="text-body1">Çıkış yapmak istediğinize emin misiniz?</div>
+      </q-card-section>
+      <q-card-section class="row justify-center">
+        <q-btn
+          label="Evet"
+          color="primary"
+          @click="handleLogout"
+          :style="{ width: '75px' }"
+        />
+        <q-btn
+          label="Hayır"
+          color="negative"
+          @click="showLogoutPopup = false"
+          :style="{ width: '75px', marginLeft: '.5rem' }"
+        />
+      </q-card-section>
+    </q-card>
+  </q-dialog>
 </template>
 
 <style lang="scss">

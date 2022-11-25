@@ -34,18 +34,17 @@ export default route(function (/* { store, ssrContext } */) {
   });
 
   const userStore = useUserStore();
-
+  
   Router.beforeEach(async (to,) => {
-    const isLoggedIn = userStore.checkLoginStatus();
     const userRole = userStore.role;
 
-    if (to.meta.requiresAdmin && userRole !== ROLES.ADMIN && userRole !== ROLES.SUPERADMIN) {
+    if (to.meta.requiresAuth && userRole !== ROLES.ADMIN && userRole !== ROLES.SUPERADMIN) {
       return {
         path: '/login',
       }
     }
     
-    if (to.path === '/login' && isLoggedIn) {
+    if (to.path === '/login' && userStore.loggedIn) {
       return {
         path: '/'
       }

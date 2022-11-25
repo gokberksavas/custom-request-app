@@ -6,8 +6,7 @@ export default (req: any, res: any, next: any) => {
   
   if (token === null) return res.sendStatus(401);
 
-  jwt.verify(token, process.env.JWT_KEY!, (err: any, payload: any) => {
-
+  jwt.verify(token, process.env.ACCESS_KEY!, (err: any, decoded: any) => {
     if (err) {
       console.error(err);
 
@@ -15,5 +14,5 @@ export default (req: any, res: any, next: any) => {
     }
 
     next();
-  })
+  });
 }

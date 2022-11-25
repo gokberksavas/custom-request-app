@@ -1,10 +1,17 @@
 import { userDb } from "../../../prisma/db/user";
 import express from "express";
-import authenticateUser from "../../middleware/authenticate-user";
-import bcrypt from 'bcrypt';
+import authenticate from "../../middleware/authenticate";
+import authorize from "../../middleware/authorize";
+import bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
 
 export const userRouter = express.Router();
+
+userRouter.get('/', authorize, async (req, res) => {
+  const allUsers = await userDb.getAllUsers();
+
+  res.status(200).send(allUsers);
+});
 
 userRouter.post('/register', async (req, res) => {
   const user = req.body;
@@ -15,24 +22,49 @@ userRouter.post('/register', async (req, res) => {
 
   const createdUser = await userDb.createUser(user);
 
-  if(createdUser) {
+  if (createdUser) {
     res.status(200).send(createdUser);
   } else {
     res.status(404).send('Could not create the user!');
   }
 });
 
-userRouter.post('/login', async (req, res) => {
-  const { password, email } = req.body;
-  const authenticated = await authenticateUser(email, password);
+userRouter.post('/login', authenticate, async (req, res) => {
+  const { email } = req.body;
 
-  if (authenticated) {
+  try {
     const user = await userDb.getUser({ email: email });
-    const signedJwt = user && jwt.sign({ email: email }, process.env.JWT_KEY!, { expiresIn: '20m'});
+    const accessToken = jwt.sign({ user: user }, process.env.ACCESS_KEY!, { expiresIn: '15m' });
+    const refreshToken = jwt.sign({ userEmail: user?.email }, process.env.REFRESH_KEY!, { expiresIn: '3h' });
 
-    res.status(200).send(Object.assign({ user: user, token: signedJwt}));
+    res.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true,
+      maxAge: 12 * 60 * 60 * 1000,
+    });
+      
+    res.status(200).send({ accessToken });
+  } catch (err) {
+    res.status(400).send(err);
   }
-  else {
-    res.status(404).send({ message: 'Invalid email or password!'});
+});
+
+userRouter.post('/refresh', async (req, res) => {
+  const refreshToken = req.cookies.refresh_token;
+
+  if (refreshToken) {
+    jwt.verify(refreshToken, process.env.REFRESH_KEY!, async (err: any, decoded: any) => {
+      if (err) return res.status(406).send({ message: 'Could not verify refresh token' });
+
+      try {
+        const user = await userDb.getUser({ email: decoded.userEmail });
+        const accessToken = jwt.sign({ user: user }, process.env.ACCESS_KEY!, { expiresIn: '15m' });
+
+        return res.status(200).send({ accessToken })
+      } catch (err) {
+        return res.status(400).send(err);
+      } 
+    });
   }
 });

@@ -7,10 +7,15 @@ import cookieParser from 'cookie-parser'
 dotenv.config();
 
 const app = express();
+const corsConfig = {
+  origin: 'http://localhost:9000',
+  credentials: true,
+  methods: 'GET, POST, PUT, DELETE, OPTIONS'
+}
 
 app.use(cookieParser());
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsConfig));
 app.use('/', orderRouter);
 app.use('/user', userRouter);
 

@@ -2,6 +2,7 @@
 import { defineComponent, ref, watch, computed, reactive } from 'vue';
 import type { Ref } from 'vue';
 import { ROLES } from 'src/enums';
+import * as validation from '../utilities/validate-inputs';
 
 export default defineComponent({
   name: 'CreateUserPopup',
@@ -11,16 +12,13 @@ export default defineComponent({
   emits: ['popup-closed'],
   setup(props, { emit }) {
     const formData = reactive({
-      name: '',
+      full_name: '',
       email: '',
       password: '',
       role: '',
     });
     const roleOptions = Object.keys(ROLES).map((key) => {
-      return {
-        label: ROLES[key as keyof typeof ROLES],
-        value: ROLES[key as keyof typeof ROLES],
-      };
+      return ROLES[key as keyof typeof ROLES];
     });
 
     const showDialog: Ref<boolean> = ref(props.show);
@@ -31,15 +29,38 @@ export default defineComponent({
       emit('popup-closed');
     };
 
+    const handleSubmit = () => {
+      fetch(`${process.env.API}/user/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData),
+      });
+    };
+
+    const disableSubmitButton: Ref<boolean> = ref(true);
+
     watch(show, (newShow) => {
       showDialog.value = newShow;
     });
+
+    watch(formData, (newData) => {
+      disableSubmitButton.value = !(
+        validation.validateName(newData.full_name) &&
+        validation.validateEmail(newData.email) &&
+        validation.validatePassword(newData.password) &&
+        newData.role !== ''
+      );
+    })
 
     return {
       showDialog,
       formData,
       roleOptions,
       onClose,
+      handleSubmit,
+      disableSubmitButton
     };
   },
 });
@@ -52,9 +73,9 @@ export default defineComponent({
         <div class="text-h5 text-center">Yeni Kullanıcı Oluştur</div>
       </q-card-section>
       <q-card-section>
-        <q-form>
+        <q-form @submit="handleSubmit">
           <q-input
-            v-model="formData.name"
+            v-model="formData.full_name"
             label="Kullanıcı Adı"
             class="q-mb-md"
             filled
@@ -69,6 +90,9 @@ export default defineComponent({
             v-model="formData.password"
             label="Kullanıcı Şifresi"
             class="q-mb-md"
+            hint="En az 8 karakter, 1 harf ve 1 sayı içermeli!"
+            hide-hint
+            :hide-bottom-space="true"
             filled
           />
           <q-select
@@ -78,17 +102,17 @@ export default defineComponent({
             :options="roleOptions"
             filled
           />
+          <div class="flex justify-center">
+            <q-btn label="Tamam" color="primary" size="md" type="submit" :disable="disableSubmitButton"/>
+            <q-btn
+              label="Kapat"
+              color="negative"
+              @click="onClose"
+              size="md"
+              class="q-ml-sm"
+            />
+          </div>
         </q-form>
-      </q-card-section>
-      <q-card-section class="flex row justify-center q-pa-none">
-        <q-btn label="Tamam" color="primary" size="md" />
-        <q-btn
-          label="Kapat"
-          color="negative"
-          @click="onClose"
-          size="md"
-          class="q-ml-sm"
-        />
       </q-card-section>
     </q-card>
   </q-dialog>

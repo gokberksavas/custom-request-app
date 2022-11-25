@@ -1,8 +1,17 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, onMounted } from 'vue';
+import { useUserStore } from './stores/user';
+
 
 export default defineComponent({
   name: 'App',
+  setup() {
+    const { checkAndRefreshToken } = useUserStore();
+
+    onMounted(() => {
+      checkAndRefreshToken();
+    });
+  }
 });
 </script>
 

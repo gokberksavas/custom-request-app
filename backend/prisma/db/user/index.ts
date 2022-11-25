@@ -29,7 +29,7 @@ const getUserCredentials = async (userEmail: string) :Promise<{ email: string, p
   return userCredentials;
 };
 
-const getUser = async (identifiers: { email?: string, password?: string }) :Promise<Partial<User> | null>=> {
+const getUser = async (identifiers: { email?: string, id?: number }) :Promise<Partial<User> | null>=> {
   const user = await prisma.user.findUnique({
     where: identifiers,
     select: {
@@ -41,10 +41,25 @@ const getUser = async (identifiers: { email?: string, password?: string }) :Prom
   });
 
   return user;
+};
+
+const getAllUsers = async () => {
+  const allUsers = await prisma.user.findMany({
+    select: {
+      id: true,
+      email: true,
+      full_name: true,
+      role: true,
+    },
+    orderBy: { id: 'desc' } 
+  });
+
+  return allUsers;
 }
 
 export const userDb = {
   createUser,
   getUserCredentials,
   getUser,
+  getAllUsers,
 };
